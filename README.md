@@ -18,6 +18,7 @@
 
 - **Frontend**: React
 - **Backend**: Spring Boot
+- **Data**: MySQL
 - **버전 관리**: Git & GitHub
 
 ---
