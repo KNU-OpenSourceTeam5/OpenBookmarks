@@ -26,6 +26,6 @@
 
 | 이름 | 역할 | 기술 스택 |
 |------|------|------------|
-| 정현제 | 데이터 백엔드 | Python |
-| 송희준 | 개발 백엔드 | Spring Boot |
-| 박성준 | 프론트엔드 | React |
+| 정현제 | Backend | Spring Boot |
+| 송희준 | Backend | Spring Boot |
+| 박성준 | Frontend | React |
