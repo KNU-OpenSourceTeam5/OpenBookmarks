@@ -1,27 +1,35 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { addLink } from '../services/api';
 
-const LinkForm = ({ onAddLink }) => {
+const LinkForm = () => {
   const [newLink, setNewLink] = useState({
     title: '',
     url: '',
-    description: '',
+    contents: '',
     category: '기술',
   });
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (newLink.title && newLink.url) {
-      onAddLink(newLink);
-      setNewLink({ title: '', url: '', description: '', category: '기술' });
-      navigate('/');
+      try {
+        await addLink(newLink);
+        setNewLink({ title: '', url: '', contents: '', category: '기술' });
+        navigate('/');
+      } catch (err) {
+        console.log(err)
+        setError('링크 추가에 실패했습니다.');
+      }
     }
   };
 
   return (
     <div className="bg-gray-100 p-6 rounded-lg mb-8">
       <h2 className="text-xl font-semibold mb-4">새 링크 추가</h2>
+      {error && <p className="text-red-600 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
@@ -39,8 +47,8 @@ const LinkForm = ({ onAddLink }) => {
         />
         <textarea
           placeholder="설명"
-          value={newLink.description}
-          onChange={(e) => setNewLink({ ...newLink, description: e.target.value })}
+          value={newLink.contents}
+          onChange={(e) => setNewLink({ ...newLink, contents: e.target.value })}
           className="w-full p-2 border rounded"
         ></textarea>
         <select

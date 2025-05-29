@@ -1,47 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import LinkCard from './LinkCard';
+import { getLinks } from '../services/api';
 
-const CategorySection = ({ links, onLike, onView, currentUser, searchQuery }) => {
+const CategorySection = ({ links, currentUser, searchQuery }) => {
   const { categoryName } = useParams();
   const [sortBy, setSortBy] = useState('latest');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [displayLinks, setDisplayLinks] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
   const linksPerPage = 6;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  let displayLinks = [];
-  if (categoryName === '좋아요') {
-    displayLinks = Object.values(links)
-      .flat()
-      .filter((link) => link.likedBy.includes(currentUser));
-  } else if (links[categoryName]) {
-    displayLinks = [...links[categoryName]];
-  } else {
-    return <div className="text-center text-gray-600">카테고리를 찾을 수 없습니다.</div>;
-  }
-
-  // 검색어로 필터링
-  if (searchQuery) {
-    const lowerQuery = searchQuery.toLowerCase();
-    displayLinks = displayLinks.filter(
-      (link) =>
-        link.title.toLowerCase().includes(lowerQuery) ||
-        link.url.toLowerCase().includes(lowerQuery) ||
-        link.description.toLowerCase().includes(lowerQuery) ||
-        categoryName.toLowerCase().includes(lowerQuery)
-    );
-  }
-
-  const sortedLinks = displayLinks.sort((a, b) => {
-    if (sortBy === 'views') return b.views - a.views;
-    if (sortBy === 'likes') return b.likes - a.likes;
-    return new Date(b.createdAt) - new Date(a.createdAt);
-  });
-
-  const totalPages = Math.ceil(sortedLinks.length / linksPerPage);
-  const indexOfLastLink = currentPage * linksPerPage;
-  const indexOfFirstLink = indexOfLastLink - linksPerPage;
-  const currentLinks = sortedLinks.slice(indexOfFirstLink, indexOfLastLink);
+  useEffect(() => {
+    const fetchLinks = async () => {
+      try {
+        const params = {
+          page: currentPage - 1,
+          size: linksPerPage,
+          sort: sortBy === 'views' ? 'views,desc' : sortBy === 'likes' ? 'likes,desc' : 'createdAt,desc',
+        };
+        if (categoryName === '좋아요') {
+          params.likedBy = currentUser;
+        } else if (categoryName) {
+          params.category = categoryName;
+        }
+        if (searchQuery) {
+          params.search = searchQuery;
+        }
+        const response = await getLinks(params);
+        setDisplayLinks(response.data.content || []);
+        setTotalPages(response.data.totalPages || 1);
+        setLoading(false);
+      } catch (err) {
+        setError('링크를 불러오는데 실패했습니다.');
+        setLoading(false);
+      }
+    };
+    fetchLinks();
+  }, [categoryName, currentUser, searchQuery, currentPage, sortBy]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -56,6 +55,9 @@ const CategorySection = ({ links, onLike, onView, currentUser, searchQuery }) =>
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  if (loading) return <div className="text-center p-4">로딩 중...</div>;
+  if (error) return <div className="text-center p-4 text-red-600">{error}</div>;
 
   return (
     <div className="mb-8">
@@ -121,14 +123,12 @@ const CategorySection = ({ links, onLike, onView, currentUser, searchQuery }) =>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {currentLinks.length > 0 ? (
-          currentLinks.map((link) => (
+        {displayLinks.length > 0 ? (
+          displayLinks.map((link) => (
             <LinkCard
               key={link.id}
               link={link}
-              category={categoryName !== '좋아요' ? categoryName : Object.keys(links).find((cat) => links[cat].some((l) => l.id === link.id))}
-              onLike={onLike}
-              onView={onView}
+              category={categoryName !== '좋아요' ? categoryName : link.category}
               currentUser={currentUser}
             />
           ))

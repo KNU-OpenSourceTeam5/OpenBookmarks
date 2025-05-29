@@ -3,12 +3,18 @@ package com.example.openbookmarks_be.domain;
 import com.example.openbookmarks_be.dto.request.LinkRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "link")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class Link {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,12 +30,25 @@ public class Link {
     @Column(nullable = false)
     private String url;
 
-    @Column(nullable = false,columnDefinition = "BIGINT DEFAULT 0")
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long likes;
 
-    @Column(nullable = false,columnDefinition = "BIGINT DEFAULT 0")
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long view;
 
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '기타'")
+    private String category;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @ElementCollection
+    @CollectionTable(name = "link_liked_by", joinColumns = @JoinColumn(name = "link_id"))
+    @Column(name = "liked_by")
+    private List<String> likedBy;
+
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '익명'")
+    private String uploadedBy;
 
     public Link(LinkRequestDto dto) {
         this.title = dto.getTitle();
@@ -37,6 +56,22 @@ public class Link {
         this.url = dto.getUrl();
         this.likes = 0L;
         this.view = 0L;
+        this.category = dto.getCategory() != null ? dto.getCategory() : "기타";
+        this.uploadedBy = dto.getUploadedBy() != null ? dto.getUploadedBy() : "익명";
+        this.createdAt = LocalDateTime.now();
+        this.likedBy = new ArrayList<>();
     }
 
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.category == null) {
+            this.category = "기타";
+        }
+        if (this.uploadedBy == null) {
+            this.uploadedBy = "익명";
+        }
+    }
 }

@@ -1,19 +1,33 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { toggleLike, incrementView } from '../services/api';
 
-const LinkCard = ({ link, onLike, onView, category, currentUser }) => {
-  const handleClick = () => {
-    onView(category, link.id);
+const LinkCard = ({ link, category, currentUser }) => {
+  const handleLike = async () => {
+    if (!currentUser) {
+      alert('로그인 후 좋아요를 누를 수 있습니다.');
+      return;
+    }
+    try {
+      await toggleLike(link.id);
+      // 백엔드에서 업데이트된 링크 상태를 반영하도록 상위 컴포넌트에서 리프레시
+    } catch (err) {
+      alert('좋아요 처리에 실패했습니다.');
+    }
   };
 
-  const handleLike = () => {
-    onLike(category, link.id);
+  const handleView = async () => {
+    try {
+      await incrementView(link.id);
+    } catch (err) {
+      console.error('조회수 증가 실패:', err);
+    }
   };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col">
       <Link
-        to={`/link/${link.id}`}
+        to={`/links/${link.id}`}
         className="text-lg font-semibold text-gray-800 hover:text-blue-600 mb-2"
       >
         {link.title}
@@ -23,7 +37,7 @@ const LinkCard = ({ link, onLike, onView, category, currentUser }) => {
         target="_blank"
         rel="noopener noreferrer"
         className="text-blue-600 hover:underline mb-2"
-        onClick={handleClick}
+        onClick={handleView}
       >
         {link.url}
       </a>
@@ -35,7 +49,7 @@ const LinkCard = ({ link, onLike, onView, category, currentUser }) => {
         >
           <svg
             className="w-5 h-5 mr-1"
-            fill={link.likedBy.includes(currentUser) ? 'currentColor' : 'none'}
+            fill={'currentColor'}
             stroke="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"

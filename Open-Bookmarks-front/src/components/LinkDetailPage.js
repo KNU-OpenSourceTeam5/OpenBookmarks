@@ -1,37 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { getComments, addComment, incrementView, toggleLike } from '../services/api';
 
-const LinkDetailPage = ({ links, comments, onLike, onView, addComment, currentUser }) => {
+const LinkDetailPage = ({ links, currentUser }) => {
   const { linkId } = useParams();
-  const link = Object.values(links)
-    .flat()
-    .find((l) => l.id === linkId);
-  const category = Object.keys(links).find((cat) => links[cat].some((l) => l.id === linkId));
+  const [link, setLink] = useState(null);
+  const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (!link) {
-    return <div className="text-center text-gray-600">링크를 찾을 수 없습니다.</div>;
-  }
+  const category = Object.keys(links).find((cat) => links[cat].some((l) => l.id === linkId));
 
-  const handleLike = () => {
-    onLike(category, link.id);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 링크는 App.js에서 제공된 links 사용
+        const foundLink = Object.values(links)
+          .flat()
+          .find((l) => l.id === linkId);
+        if (!foundLink) throw new Error('링크를 찾을 수 없습니다.');
+        setLink(foundLink);
+
+        // 조회수 증가
+        await incrementView(linkId);
+
+        // 댓글 가져오기
+        const commentResponse = await getComments(linkId);
+        setComments(commentResponse.data || []);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message || '데이터를 불러오는데 실패했습니다.');
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [linkId, links]);
+
+  const handleLike = async () => {
+    if (!currentUser) {
+      alert('로그인 후 좋아요를 누를 수 있습니다.');
+      return;
+    }
+    try {
+      await toggleLike(linkId);
+      // 백엔드에서 업데이트된 링크 상태를 반영하도록 리프레시
+    } catch (err) {
+      alert('좋아요 처리에 실패했습니다.');
+    }
   };
 
-  const handleView = () => {
-    onView(category, link.id);
-  };
-
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) {
       alert('로그인 후 댓글을 작성할 수 있습니다.');
       return;
     }
     if (commentText.trim()) {
-      addComment(link.id, commentText);
-      setCommentText('');
+      try {
+        await addComment({ linkId, text: commentText });
+        setCommentText('');
+        const commentResponse = await getComments(linkId);
+        setComments(commentResponse.data || []);
+      } catch (err) {
+        alert('댓글 작성에 실패했습니다.');
+      }
     }
   };
+
+  if (loading) return <div className="text-center p-4">로딩 중...</div>;
+  if (error) return <div className="text-center p-4 text-red-600">{error}</div>;
+  if (!link) return <div className="text-center text-gray-600">링크를 찾을 수 없습니다.</div>;
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -48,7 +87,6 @@ const LinkDetailPage = ({ links, comments, onLike, onView, addComment, currentUs
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline"
-          onClick={handleView}
         >
           {link.url}
         </a>
@@ -101,8 +139,8 @@ const LinkDetailPage = ({ links, comments, onLike, onView, addComment, currentUs
           </p>
         )}
         <div className="space-y-4">
-          {(comments[link.id] || []).length > 0 ? (
-            comments[link.id].map((comment) => (
+          {comments.length > 0 ? (
+            comments.map((comment) => (
               <div key={comment.id} className="bg-gray-100 p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-semibold text-gray-800">{comment.user}</span>
