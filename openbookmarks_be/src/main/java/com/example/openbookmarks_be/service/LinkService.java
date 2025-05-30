@@ -50,4 +50,34 @@ public class LinkService {
 
         return new PageImpl<>(dtos, pageable, linksPage.getTotalElements());
     }
+
+
+    // LinkService.java
+    public List<LinkResponseDto> findLinksByPartialTitle(String title) {
+        List<Link> links = linkRepository.findAllByTitleContainingIgnoreCase(title);
+
+        return links.stream().map(link -> {
+            LinkResponseDto dto = new LinkResponseDto();
+            dto.setId(link.getId());
+            dto.setTitle(link.getTitle());
+            dto.setDescription(link.getContents());
+            dto.setUrl(link.getUrl());
+            dto.setViews(link.getView());
+            dto.setLikes(link.getLikes());
+            dto.setCategory(link.getCategory());
+            dto.setCreatedAt(link.getCreatedAt());
+            dto.setLikedBy(link.getLikedBy());
+            dto.setUploadedBy(link.getUploadedBy());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+
+
+
+
+
+
+
+
 }
