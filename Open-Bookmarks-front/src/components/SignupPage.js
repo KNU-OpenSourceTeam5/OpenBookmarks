@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { signup } from '../services/api';
 
 const SignupPage = ({ onSignup }) => {
   const [credentials, setCredentials] = useState({
@@ -7,21 +8,31 @@ const SignupPage = ({ onSignup }) => {
     password: '',
     confirmPassword: '',
   });
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (credentials.username && credentials.password && credentials.password === credentials.confirmPassword) {
-      onSignup(credentials.username);
+    if (credentials.password !== credentials.confirmPassword) {
+      setError('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    try {
+      const response = await signup({
+        username: credentials.username,
+        password: credentials.password,
+      });
+      onSignup(response.data.user, response.data.token);
       navigate('/');
-    } else if (credentials.password !== credentials.confirmPassword) {
-      alert('비밀번호가 일치하지 않습니다.');
+    } catch (err) {
+      setError('회원가입에 실패했습니다. 사용자 이름을 확인하세요.');
     }
   };
 
   return (
     <div className="max-w-md mx-auto bg-gray-100 p-6 rounded-lg mb-8">
       <h2 className="text-2xl font-bold text-gray-900 mb-4">회원가입</h2>
+      {error && <p className="text-red-600 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"

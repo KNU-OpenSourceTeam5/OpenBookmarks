@@ -1,9 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import LinkCard from './LinkCard';
+import { getUserProfile } from '../services/api';
 
-const ProfilePage = ({ links, comments, currentUser }) => {
-  const [activeTab, setActiveTab] = useState('uploads');
+const ProfilePage = ({ currentUser }) => {
+  const [activeTab, setActiveTab] = useState('Uploads');
+  const [profileData, setProfileData] = useState({ uploadedLinks: [], likedLinks: [], comments: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await getUserProfile();
+        setProfileData({
+          uploadedLinks: response.data.uploadedLinks || [],
+          likedLinks: response.data.likedLinks || [],
+          comments: response.data.comments || [],
+        });
+        setLoading(false);
+      } catch (err) {
+        setError('프로필 데이터를 불러오는데 실패했습니다.');
+        setLoading(false);
+      }
+    };
+    if (currentUser) fetchProfile();
+  }, [currentUser]);
 
   if (!currentUser) {
     return (
@@ -13,32 +35,10 @@ const ProfilePage = ({ links, comments, currentUser }) => {
     );
   }
 
-  const uploadedLinks = Object.entries(links)
-    .flatMap(([category, linkList]) =>
-      linkList
-        .filter((link) => link.uploadedBy === currentUser)
-        .map((link) => ({ ...link, category }))
-    );
+  if (loading) return <div className="text-center p-4">로딩 중...</div>;
+  if (error) return <div className="text-center p-4 text-red-600">{error}</div>;
 
-  const likedLinks = Object.entries(links)
-    .flatMap(([category, linkList]) =>
-      linkList
-        .filter((link) => link.likedBy.includes(currentUser))
-        .map((link) => ({ ...link, category }))
-    );
-
-  const userComments = Object.entries(comments)
-    .flatMap(([linkId, commentList]) =>
-      commentList
-        .filter((comment) => comment.user === currentUser)
-        .map((comment) => ({
-          ...comment,
-          linkId,
-          linkTitle: Object.values(links)
-            .flat()
-            .find((link) => link.id === linkId)?.title || '알 수 없는 링크',
-        }))
-    );
+  const { uploadedLinks, likedLinks, comments } = profileData;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -88,8 +88,6 @@ const ProfilePage = ({ links, comments, currentUser }) => {
                   key={link.id}
                   link={link}
                   category={link.category}
-                  onLike={() => {}}
-                  onView={() => {}}
                   currentUser={currentUser}
                 />
               ))}
@@ -110,8 +108,6 @@ const ProfilePage = ({ links, comments, currentUser }) => {
                   key={link.id}
                   link={link}
                   category={link.category}
-                  onLike={() => {}}
-                  onView={() => {}}
                   currentUser={currentUser}
                 />
               ))}
@@ -125,9 +121,9 @@ const ProfilePage = ({ links, comments, currentUser }) => {
       {activeTab === 'Comments' && (
         <div>
           <h2 className="text-xl font-semibold text-gray-900 mb-4">작성한 댓글</h2>
-          {userComments.length > 0 ? (
+          {comments.length > 0 ? (
             <div className="space-y-4">
-              {userComments.map((comment) => (
+              {comments.map((comment) => (
                 <div key={comment.id} className="bg-gray-100 p-4 rounded-lg">
                   <div className="flex justify-between items-center mb-2">
                     <Link
