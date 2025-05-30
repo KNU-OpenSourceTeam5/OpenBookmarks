@@ -20,6 +20,7 @@ api.interceptors.request.use(
 );
 
 export const getLinks = (params) => api.get('/links', { params });
+export const getLinksByTitle = (title) => api.get(`/links/${encodeURIComponent(title)}`);
 export const addLink = (link) => api.post('/links', link);
 export const toggleLike = (linkId) => api.put(`/links/${linkId}/like`);
 export const incrementView = (linkId) => api.put(`/links/${linkId}/view`);
