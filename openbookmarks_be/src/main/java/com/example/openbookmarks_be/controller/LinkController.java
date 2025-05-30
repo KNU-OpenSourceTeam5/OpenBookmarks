@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -50,4 +51,13 @@ public class LinkController {
         linkService.createLink(requestDto);
         return ResponseEntity.status(201).build();
     }
+
+
+    // LinkController.java
+    @GetMapping("/{title}")
+    public ResponseEntity<List<LinkResponseDto>> getLinksByTitle(@PathVariable String title) {
+        List<LinkResponseDto> dtos = linkService.findLinksByPartialTitle(title);
+        return ResponseEntity.ok(dtos);
+    }
+
 }
