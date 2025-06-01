@@ -3,11 +3,13 @@ package com.example.openbookmarks_be.controller;
 import com.example.openbookmarks_be.dto.request.LinkRequestDto;
 import com.example.openbookmarks_be.dto.response.LinkResponseDto;
 import com.example.openbookmarks_be.service.LinkService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,10 +48,20 @@ public class LinkController {
         return ResponseEntity.ok(response);
     }
 
+
+
     @PostMapping
-    public ResponseEntity<Void> createLink(@RequestBody LinkRequestDto requestDto) {
-        linkService.createLink(requestDto);
-        return ResponseEntity.status(201).build();
+    public ResponseEntity<Void> createLink(
+            @RequestBody LinkRequestDto linkRequestDto,
+            HttpSession session) {
+
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        linkService.createLink(linkRequestDto, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).build(); // 201만 응답
     }
 
 

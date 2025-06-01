@@ -1,9 +1,11 @@
 package com.example.openbookmarks_be.service;
 
 import com.example.openbookmarks_be.domain.Link;
+import com.example.openbookmarks_be.domain.User;
 import com.example.openbookmarks_be.dto.request.LinkRequestDto;
 import com.example.openbookmarks_be.dto.response.LinkResponseDto;
 import com.example.openbookmarks_be.repository.LinkRepository;
+import com.example.openbookmarks_be.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,14 +20,29 @@ import java.util.stream.Collectors;
 public class LinkService {
 
     private final LinkRepository linkRepository;
+    private final UserRepository userRepository;
 
-    public Link createLink(LinkRequestDto dto) {
+
+
+//    public void createLink(LinkRequestDto dto, Long userId) {
+//        Link link = new Link(dto);
+//        linkRepository.save(link);
+//    }
+
+    public void createLink(LinkRequestDto dto, Long userId) {
+        String username = userRepository.findById(userId)
+                .map(User::getUsername)
+                .orElse("익명");
+
+        // uploadedBy를 덮어쓰기
+        dto.setUploadedBy(username);
+
         Link link = new Link(dto);
-        return linkRepository.save(link);
+        linkRepository.save(link);
     }
 
     public Page<LinkResponseDto> getLinks(String category, String search, String likedBy, Pageable pageable) {
-        // 카테고리 필터링
+
         Page<Link> linksPage = category != null && !category.equals("좋아요")
                 ? linkRepository.findByCategory(category, pageable)
                 : linkRepository.findAll(pageable);

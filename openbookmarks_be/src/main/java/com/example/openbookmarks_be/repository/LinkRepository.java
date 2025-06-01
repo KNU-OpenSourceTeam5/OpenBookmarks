@@ -13,4 +13,6 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
 
     List<Link> findAllByTitleContainingIgnoreCase(String title);
 
+
+
 }
