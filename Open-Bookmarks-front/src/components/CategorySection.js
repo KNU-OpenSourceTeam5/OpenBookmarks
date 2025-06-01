@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import LinkCard from './LinkCard';
-import { getLinks } from '../services/api';
+import { getLinks, getLinksByTitle } from '../services/api';
 
 const CategorySection = ({ links, currentUser, searchQuery }) => {
   const { categoryName } = useParams();
@@ -17,22 +17,46 @@ const CategorySection = ({ links, currentUser, searchQuery }) => {
   useEffect(() => {
     const fetchLinks = async () => {
       try {
-        const params = {
-          page: currentPage - 1,
-          size: linksPerPage,
-          sort: sortBy === 'views' ? 'views,desc' : sortBy === 'likes' ? 'likes,desc' : 'createdAt,desc',
-        };
-        if (categoryName === '좋아요') {
-          params.likedBy = currentUser;
-        } else if (categoryName) {
-          params.category = categoryName;
-        }
+        let linksData = [];
         if (searchQuery) {
-          params.search = searchQuery;
+          // 검색 시 GET /links/{title} 호출
+          const response = await getLinksByTitle(searchQuery);
+          linksData = response.data || [];
+        } else {
+          // 기존 GET /links 호출
+          const params = {
+            page: currentPage - 1,
+            size: linksPerPage,
+            sort: sortBy === 'views' ? 'views,desc' : sortBy === 'likes' ? 'likes,desc' : 'createdAt,desc',
+          };
+          if (categoryName === '좋아요') {
+            params.likedBy = currentUser;
+          } else if (categoryName) {
+            params.category = categoryName;
+          }
+          const response = await getLinks(params);
+          linksData = response.data.content || [];
+          setTotalPages(response.data.totalPages || 1);
         }
-        const response = await getLinks(params);
-        setDisplayLinks(response.data.content || []);
-        setTotalPages(response.data.totalPages || 1);
+
+        // 클라이언트 측 필터링: 카테고리
+        if (categoryName && categoryName !== '좋아요') {
+          linksData = linksData.filter(link => link.category === categoryName);
+        }
+
+        // 클라이언트 측 정렬
+        linksData.sort((a, b) => {
+          if (sortBy === 'views') return b.views - a.views;
+          if (sortBy === 'likes') return b.likes - a.likes;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        // 클라이언트 측 페이지네이션
+        const start = (currentPage - 1) * linksPerPage;
+        const end = start + linksPerPage;
+        const paginatedLinks = linksData.slice(start, end);
+        setDisplayLinks(paginatedLinks);
+        setTotalPages(Math.ceil(linksData.length / linksPerPage) || 1);
         setLoading(false);
       } catch (err) {
         setError('링크를 불러오는데 실패했습니다.');
