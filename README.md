@@ -22,3 +22,11 @@
 - **버전 관리**: Git & GitHub
 
 ---
+
+## 🤝 컨트리뷰션 가이드
+
+이 프로젝트는 누구나 자유롭게 기여할 수 있습니다. 기여 방법 및 절차는 [CONTRIBUTING.md](./CONTRIBUTING.md) 파일을 참고해 주세요.
+
+프로젝트에 참여하실 때는 [Code of Conduct](./CODE_OF_CONDUCT.md)를 꼭 준수해 주시기 바랍니다.
+
+---
