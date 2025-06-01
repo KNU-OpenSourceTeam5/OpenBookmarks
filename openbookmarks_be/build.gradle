@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0' // SQLite 의존성 추가
+	implementation 'org.hibernate.orm:hibernate-community-dialects:6.4.4.Final' // Hibernate Dialect for SQLite
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
