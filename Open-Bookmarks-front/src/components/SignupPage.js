@@ -1,32 +1,52 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signup } from '../services/api';
+import { register } from '../services/api';
 
 const SignupPage = ({ onSignup }) => {
-  const [credentials, setCredentials] = useState({
+  const [userData, setUserData] = useState({
     username: '',
     password: '',
-    confirmPassword: '',
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (credentials.password !== credentials.confirmPassword) {
-      setError('비밀번호가 일치하지 않습니다.');
+    const { username, password } = userData;
+
+    if (!username || !password) {
+      setError('사용자 이름과 비밀번호를 입력해주세요.');
       return;
     }
+
+    if (username.length < 3) {
+      setError('사용자 이름은 3자 이상이어야 합니다.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('비밀번호는 6자 이상이어야 합니다.');
+      return;
+    }
+
     try {
-      const response = await signup({
-        username: credentials.username,
-        password: credentials.password,
-      });
-      onSignup(response.data.user, response.data.token);
+      console.log('회원가입 요청:', { username }); // 디버깅
+      const response = await register(userData);
+      console.log('회원가입 응답:', response.data); // 디버깅
+      onSignup({ username });
       navigate('/');
     } catch (err) {
-      setError('회원가입에 실패했습니다. 사용자 이름을 확인하세요.');
+      console.error('회원가입 오류:', err.status, err);
+      if (err.status === 400) {
+        setError(err || '이미 존재하는 사용자 이름입니다.');
+      } else {
+        setError(err || '회원가입에 실패했습니다.');
+      }
     }
+  };
+
+  const handleChange = (e) => {
+    setUserData({ ...userData, [e.target.name]: e.target.value });
   };
 
   return (
@@ -36,28 +56,25 @@ const SignupPage = ({ onSignup }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
+          name="username"
           placeholder="사용자 이름"
-          value={credentials.username}
-          onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+          value={userData.username}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
         <input
           type="password"
+          name="password"
           placeholder="비밀번호"
-          value={credentials.password}
-          onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+          value={userData.password}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="비밀번호 확인"
-          value={credentials.confirmPassword}
-          onChange={(e) => setCredentials({ ...credentials, confirmPassword: e.target.value })}
-          className="w-full p-2 border rounded"
+          required
         />
         <button
           type="submit"
-          className="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+          className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           회원가입
         </button>
