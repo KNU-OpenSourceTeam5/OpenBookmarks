@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../services/api';
+import { login, checkSession } from '../services/api';
 
 const LoginPage = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({
@@ -12,13 +12,27 @@ const LoginPage = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { username, password } = credentials;
+
+    if (!username || !password) {
+      setError('사용자 이름과 비밀번호를 입력해주세요.');
+      return;
+    }
+
     try {
-      const response = await login(credentials);
-      onLogin(response.data.user, response.data.token);
+      console.log('로그인 요청:', { username, password });
+      await login({ username, password });
+      await checkSession(); // 세션 확인
+      onLogin({ username });
       navigate('/');
     } catch (err) {
-      setError('로그인에 실패했습니다. 사용자 이름 또는 비밀번호를 확인하세요.');
+      console.error('로그인 오류:', err.status, err.error);
+      setError(err.error || '로그인에 실패했습니다. 사용자 이름 또는 비밀번호를 확인하세요.');
     }
+  };
+
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
   return (
@@ -28,17 +42,21 @@ const LoginPage = ({ onLogin }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
+          name="username"
           placeholder="사용자 이름"
           value={credentials.username}
-          onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
         <input
           type="password"
+          name="password"
           placeholder="비밀번호"
           value={credentials.password}
-          onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
         <button
           type="submit"
@@ -49,7 +67,7 @@ const LoginPage = ({ onLogin }) => {
       </form>
       <p className="mt-4 text-center">
         계정이 없으신가요?{' '}
-        <Link to="/signup" className="text-blue-600 hover:underline">
+        <Link to="/register" className="text-blue-600 hover:underline">
           회원가입
         </Link>
       </p>

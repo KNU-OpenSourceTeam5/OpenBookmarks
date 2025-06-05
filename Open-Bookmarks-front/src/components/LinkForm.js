@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addLink } from '../services/api';
+import { addLink, checkSession } from '../services/api';
 
 const LinkForm = () => {
   const [newLink, setNewLink] = useState({
@@ -11,19 +11,62 @@ const LinkForm = () => {
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem('username');
+
+  useEffect(() => {
+    const verifySession = async () => {
+      if (!isLoggedIn) {
+        setError('로그인이 필요합니다.');
+        navigate('/login');
+        return;
+      }
+      try {
+        const response = await checkSession();
+        console.log('세션 상태:', response.data); // 디버깅
+      } catch (err) {
+        console.error('세션 확인 오류:', err.status, err.error);
+        setError('세션이 만료되었습니다. 다시 로그인해주세요.');
+        localStorage.removeItem('username');
+        navigate('/login');
+      }
+    };
+    verifySession();
+  }, [isLoggedIn, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (newLink.title && newLink.url) {
-      try {
-        await addLink(newLink);
-        setNewLink({ title: '', url: '', contents: '', category: '기술' });
-        navigate('/');
-      } catch (err) {
-        console.log(err)
-        setError('링크 추가에 실패했습니다.');
+    const { title, url, category } = newLink;
+
+    if (!title || !url || !category) {
+      setError('제목, URL, 카테고리는 필수 입력 항목입니다.');
+      return;
+    }
+
+    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+    if (!urlRegex.test(url)) {
+      setError('유효한 URL을 입력해주세요.');
+      return;
+    }
+
+    try {
+      console.log('링크 추가 요청:', newLink);
+      await addLink(newLink);
+      setNewLink({ title: '', url: '', contents: '', category: '기술' });
+      navigate('/');
+    } catch (err) {
+      console.error('링크 추가 오류:', err.status, err.error);
+      if (err.status === 401) {
+        setError('로그인이 필요합니다. 다시 로그인해주세요.');
+        localStorage.removeItem('username');
+        navigate('/login');
+      } else {
+        setError(err.error || '링크 추가에 실패했습니다.');
       }
     }
+  };
+
+  const handleChange = (e) => {
+    setNewLink({ ...newLink, [e.target.name]: e.target.value });
   };
 
   return (
@@ -33,27 +76,33 @@ const LinkForm = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
+          name="title"
           placeholder="제목"
           value={newLink.title}
-          onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
         <input
           type="url"
+          name="url"
           placeholder="URL"
           value={newLink.url}
-          onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
+          required
         />
         <textarea
+          name="contents"
           placeholder="설명"
           value={newLink.contents}
-          onChange={(e) => setNewLink({ ...newLink, contents: e.target.value })}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
         ></textarea>
         <select
+          name="category"
           value={newLink.category}
-          onChange={(e) => setNewLink({ ...newLink, category: e.target.value })}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
         >
           <option value="기술">기술</option>

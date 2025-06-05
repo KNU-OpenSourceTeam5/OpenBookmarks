@@ -69,7 +69,7 @@ const Navbar = ({ categories, toggleSidebar, isSidebarOpen, isLoggedIn, onLogin,
                   로그인
                 </Link>
                 <Link
-                  to="/signup"
+                  to="/register"
                   className="px-3 py-2 rounded-md bg-purple-600 hover:bg-purple-700"
                 >
                   회원가입
