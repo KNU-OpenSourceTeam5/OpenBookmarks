@@ -9,11 +9,17 @@ import javax.sql.DataSource;
 @Configuration
 public class SQLiteConfig {
 
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String dbDriverClassName;
+
     @Bean
     public DataSource dataSource() {
         return DataSourceBuilder.create()
-                .url("jdbc:sqlite:bookmarks.db")
-                .driverClassName("org.sqlite.JDBC")
+                .url(dbUrl)
+                .driverClassName(dbDriverClassName)
                 .build();
     }
 }
