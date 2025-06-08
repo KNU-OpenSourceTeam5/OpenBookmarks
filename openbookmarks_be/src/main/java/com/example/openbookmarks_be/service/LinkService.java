@@ -6,23 +6,22 @@ import com.example.openbookmarks_be.dto.request.LinkRequestDto;
 import com.example.openbookmarks_be.dto.response.LinkResponseDto;
 import com.example.openbookmarks_be.repository.LinkRepository;
 import com.example.openbookmarks_be.repository.UserRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LinkService {
 
     private final LinkRepository linkRepository;
     private final UserRepository userRepository;
-
-
 
 //    public void createLink(LinkRequestDto dto, Long userId) {
 //        Link link = new Link(dto);
@@ -47,54 +46,20 @@ public class LinkService {
                 ? linkRepository.findByCategory(category, pageable)
                 : linkRepository.findAll(pageable);
 
-        System.out.println("Links count: " + linksPage.getTotalElements()); // 디버깅
-
-        // Link -> LinkResponseDto 변환
-        List<LinkResponseDto> dtos = linksPage.getContent().stream().map(link -> {
-            LinkResponseDto dto = new LinkResponseDto();
-            dto.setId(link.getId());
-            dto.setTitle(link.getTitle());
-            dto.setDescription(link.getContents());
-            dto.setUrl(link.getUrl());
-            dto.setViews(link.getView());
-            dto.setLikes(link.getLikes());
-            dto.setCategory(link.getCategory());
-            dto.setCreatedAt(link.getCreatedAt());
-            dto.setLikedBy(link.getLikedBy());
-            dto.setUploadedBy(link.getUploadedBy());
-            return dto;
-        }).collect(Collectors.toList());
-
+        log.info("Links count: {}", linksPage.getTotalElements());
+        
+        List<LinkResponseDto> dtos = linksPage.getContent().stream()
+                .map(LinkResponseDto::of)
+                .collect(Collectors.toList());
         return new PageImpl<>(dtos, pageable, linksPage.getTotalElements());
     }
 
 
     // LinkService.java
     public List<LinkResponseDto> findLinksByPartialTitle(String title) {
-        List<Link> links = linkRepository.findAllByTitleContainingIgnoreCase(title);
-
-        return links.stream().map(link -> {
-            LinkResponseDto dto = new LinkResponseDto();
-            dto.setId(link.getId());
-            dto.setTitle(link.getTitle());
-            dto.setDescription(link.getContents());
-            dto.setUrl(link.getUrl());
-            dto.setViews(link.getView());
-            dto.setLikes(link.getLikes());
-            dto.setCategory(link.getCategory());
-            dto.setCreatedAt(link.getCreatedAt());
-            dto.setLikedBy(link.getLikedBy());
-            dto.setUploadedBy(link.getUploadedBy());
-            return dto;
-        }).collect(Collectors.toList());
+        return linkRepository.findAllByTitleContainingIgnoreCase(title)
+                .stream()
+                .map(LinkResponseDto::of)
+                .collect(Collectors.toList());
     }
-
-
-
-
-
-
-
-
-
 }
