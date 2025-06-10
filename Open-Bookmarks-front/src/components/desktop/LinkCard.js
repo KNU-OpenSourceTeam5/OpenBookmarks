@@ -36,7 +36,7 @@ const LinkCard = ({ link, category, currentUser }) => {
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-blue-600 hover:underline mb-2"
+        className="text-blue-600 hover:underline mb-2 break-words max-w-full overflow-hidden"
         onClick={handleView}
       >
         {link.url}
