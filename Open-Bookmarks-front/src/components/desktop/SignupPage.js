@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { register } from '../services/api';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { register } from "../../services/api";
 
 const SignupPage = ({ onSignup }) => {
   const [userData, setUserData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -15,32 +15,32 @@ const SignupPage = ({ onSignup }) => {
     const { username, password } = userData;
 
     if (!username || !password) {
-      setError('사용자 이름과 비밀번호를 입력해주세요.');
+      setError("사용자 이름과 비밀번호를 입력해주세요.");
       return;
     }
 
     if (username.length < 3) {
-      setError('사용자 이름은 3자 이상이어야 합니다.');
+      setError("사용자 이름은 3자 이상이어야 합니다.");
       return;
     }
 
     if (password.length < 6) {
-      setError('비밀번호는 6자 이상이어야 합니다.');
+      setError("비밀번호는 6자 이상이어야 합니다.");
       return;
     }
 
     try {
-      console.log('회원가입 요청:', { username }); // 디버깅
+      console.log("회원가입 요청:", { username }); // 디버깅
       const response = await register(userData);
-      console.log('회원가입 응답:', response.data); // 디버깅
+      console.log("회원가입 응답:", response.data); // 디버깅
       onSignup({ username });
-      navigate('/');
+      navigate("/");
     } catch (err) {
-      console.error('회원가입 오류:', err.status, err);
+      console.error("회원가입 오류:", err.status, err);
       if (err.status === 400) {
-        setError(err || '이미 존재하는 사용자 이름입니다.');
+        setError(err || "이미 존재하는 사용자 이름입니다.");
       } else {
-        setError(err || '회원가입에 실패했습니다.');
+        setError(err || "회원가입에 실패했습니다.");
       }
     }
   };
@@ -80,7 +80,7 @@ const SignupPage = ({ onSignup }) => {
         </button>
       </form>
       <p className="mt-4 text-center">
-        이미 계정이 있으신가요?{' '}
+        이미 계정이 있으신가요?{" "}
         <Link to="/login" className="text-blue-600 hover:underline">
           로그인
         </Link>

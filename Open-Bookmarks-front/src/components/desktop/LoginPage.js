@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { login, checkSession } from '../services/api';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { login, checkSession } from "../../services/api";
 
 const LoginPage = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -15,19 +15,22 @@ const LoginPage = ({ onLogin }) => {
     const { username, password } = credentials;
 
     if (!username || !password) {
-      setError('사용자 이름과 비밀번호를 입력해주세요.');
+      setError("사용자 이름과 비밀번호를 입력해주세요.");
       return;
     }
 
     try {
-      console.log('로그인 요청:', { username, password });
+      console.log("로그인 요청:", { username, password });
       await login({ username, password });
       await checkSession(); // 세션 확인
       onLogin({ username });
-      navigate('/');
+      navigate("/");
     } catch (err) {
-      console.error('로그인 오류:', err.status, err.error);
-      setError(err.error || '로그인에 실패했습니다. 사용자 이름 또는 비밀번호를 확인하세요.');
+      console.error("로그인 오류:", err.status, err.error);
+      setError(
+        err.error ||
+          "로그인에 실패했습니다. 사용자 이름 또는 비밀번호를 확인하세요."
+      );
     }
   };
 
@@ -66,7 +69,7 @@ const LoginPage = ({ onLogin }) => {
         </button>
       </form>
       <p className="mt-4 text-center">
-        계정이 없으신가요?{' '}
+        계정이 없으신가요?{" "}
         <Link to="/register" className="text-blue-600 hover:underline">
           회원가입
         </Link>
