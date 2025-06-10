@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { toggleLike, incrementView } from "../services/api";
+import { toggleLike, incrementView } from "../../services/api";
 
 const LinkCard = ({ link, category, currentUser }) => {
   const handleLike = async () => {

@@ -1,33 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { addLink, checkSession } from '../services/api';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { addLink, checkSession } from "../../services/api";
 
 const LinkForm = () => {
   const [newLink, setNewLink] = useState({
-    title: '',
-    url: '',
-    contents: '',
-    category: '기술',
+    title: "",
+    url: "",
+    contents: "",
+    category: "기술",
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const isLoggedIn = !!localStorage.getItem('username');
+  const isLoggedIn = !!localStorage.getItem("username");
 
   useEffect(() => {
     const verifySession = async () => {
       if (!isLoggedIn) {
-        setError('로그인이 필요합니다.');
-        navigate('/login');
+        setError("로그인이 필요합니다.");
+        navigate("/login");
         return;
       }
       try {
         const response = await checkSession();
-        console.log('세션 상태:', response.data); // 디버깅
+        console.log("세션 상태:", response.data); // 디버깅
       } catch (err) {
-        console.error('세션 확인 오류:', err.status, err.error);
-        setError('세션이 만료되었습니다. 다시 로그인해주세요.');
-        localStorage.removeItem('username');
-        navigate('/login');
+        console.error("세션 확인 오류:", err.status, err.error);
+        setError("세션이 만료되었습니다. 다시 로그인해주세요.");
+        localStorage.removeItem("username");
+        navigate("/login");
       }
     };
     verifySession();
@@ -38,29 +38,30 @@ const LinkForm = () => {
     const { title, url, category } = newLink;
 
     if (!title || !url || !category) {
-      setError('제목, URL, 카테고리는 필수 입력 항목입니다.');
+      setError("제목, URL, 카테고리는 필수 입력 항목입니다.");
       return;
     }
 
-    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+    const urlRegex =
+      /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
     if (!urlRegex.test(url)) {
-      setError('유효한 URL을 입력해주세요.');
+      setError("유효한 URL을 입력해주세요.");
       return;
     }
 
     try {
-      console.log('링크 추가 요청:', newLink);
+      console.log("링크 추가 요청:", newLink);
       await addLink(newLink);
-      setNewLink({ title: '', url: '', contents: '', category: '기술' });
-      navigate('/');
+      setNewLink({ title: "", url: "", contents: "", category: "기술" });
+      navigate("/");
     } catch (err) {
-      console.error('링크 추가 오류:', err.status, err.error);
+      console.error("링크 추가 오류:", err.status, err.error);
       if (err.status === 401) {
-        setError('로그인이 필요합니다. 다시 로그인해주세요.');
-        localStorage.removeItem('username');
-        navigate('/login');
+        setError("로그인이 필요합니다. 다시 로그인해주세요.");
+        localStorage.removeItem("username");
+        navigate("/login");
       } else {
-        setError(err.error || '링크 추가에 실패했습니다.');
+        setError(err.error || "링크 추가에 실패했습니다.");
       }
     }
   };
