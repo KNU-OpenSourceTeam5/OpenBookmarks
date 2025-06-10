@@ -70,7 +70,7 @@ function App() {
         <Route
           path="/"
           element={
-            <div className="container mx-auto p-4 pt-20">
+            <div className="container mx-auto p-4">
               <MobileIntroPage />
             </div>
           }
@@ -78,7 +78,7 @@ function App() {
         <Route
           path="/category/:categoryName"
           element={
-            <div className="container mx-auto p-4 pt-20">
+            <div className="container mx-auto p-4">
               <MobileCategorySection
                 currentUser={currentUser}
                 searchQuery={searchQuery}
@@ -89,7 +89,7 @@ function App() {
         <Route
           path="/add"
           element={
-            <div className="container mx-auto p-4 pt-20">
+            <div className="container mx-auto p-4">
               <MobileLinkForm />
             </div>
           }
@@ -97,7 +97,7 @@ function App() {
         <Route
           path="/login"
           element={
-            <div className="container mx-auto p-4 pt-20">
+            <div className="container mx-auto p-4">
               <MobileLoginPage onLogin={handleLogin} />
             </div>
           }
@@ -105,7 +105,7 @@ function App() {
         <Route
           path="/register"
           element={
-            <div className="container mx-auto p-4 pt-20">
+            <div className="container mx-auto p-4">
               <MobileSignupPage onSignup={handleSignup} />
             </div>
           }
@@ -113,7 +113,7 @@ function App() {
         <Route
           path="/links/:linkId"
           element={
-            <div className="container mx-auto p-4 pt-20">
+            <div className="container mx-auto p-4">
               <MobileLinkDetailPage currentUser={currentUser} />
             </div>
           }
@@ -121,7 +121,7 @@ function App() {
         <Route
           path="/search"
           element={
-            <div className="container mx-auto p-4 pt-20">
+            <div className="container mx-auto p-4">
               <MobileSearchPage
                 currentUser={currentUser}
                 searchQuery={searchQuery}
@@ -132,7 +132,7 @@ function App() {
         <Route
           path="/profile"
           element={
-            <div className="container mx-auto p-4 pt-20">
+            <div className="container mx-auto p-4">
               <MobileProfilePage currentUser={currentUser} />
             </div>
           }
