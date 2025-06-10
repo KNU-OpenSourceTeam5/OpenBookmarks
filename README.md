@@ -16,10 +16,21 @@
 
 ## 🛠️ 기술 스택
 
-- **Frontend**: React
-- **Backend**: Spring Boot
-- **Data**: SQLite
-- **버전 관리**: Git & GitHub
+- **Frontend**
+  - React
+
+- **Backend**
+  - Spring Boot 3.5.0
+  - Java 21(JDK 21)
+  - Gradle (빌드 도구)
+  - Hibernate 6.4.4 (community dialect)
+  - Lombok
+
+- **Database**
+  - SQLite (`sqlite-jdbc:3.45.3.0`)
+
+- **버전 관리**
+  - Git & GitHub
 
 ---
 
