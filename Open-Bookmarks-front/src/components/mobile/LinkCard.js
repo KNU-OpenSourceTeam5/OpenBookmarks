@@ -28,7 +28,7 @@ const LinkCard = ({ link, category, currentUser }) => {
     <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col">
       <Link
         to={`/links/${link.id}`}
-        className="text-lg font-semibold text-gray-800 hover:text-blue-600 mb-2 break-words max-w-full overflow-hidden"
+        className="text-lg font-semibold text-gray-800 hover:text-blue-600 mb-2"
       >
         {link.title}
       </Link>
@@ -36,7 +36,7 @@ const LinkCard = ({ link, category, currentUser }) => {
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-blue-600 hover:underline mb-2"
+        className="text-blue-600 hover:underline mb-2 break-words max-w-full overflow-hidden"
         onClick={handleView}
       >
         {link.url}
