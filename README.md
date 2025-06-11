@@ -17,9 +17,11 @@
 ## 🛠️ 기술 스택
 
 - **Frontend**
+
   - React
 
 - **Backend**
+
   - Spring Boot 3.5.0
   - Java 21(JDK 21)
   - Gradle (빌드 도구)
@@ -27,10 +29,19 @@
   - Lombok
 
 - **Database**
+
   - SQLite (`sqlite-jdbc:3.45.3.0`)
 
 - **버전 관리**
   - Git & GitHub
+
+---
+
+## 시작하는 법
+
+1. Open-Bookmarks-front 폴더를 openbookmarks_be/src/main 폴더로 옮겨주세요.
+2. OpenbookmarksBeApplication.java 파일을 실행하여 서버를 시작해주세요.
+3. Open-Bookmarks-front 폴더에서 `npm install`을 실행해 필요한 패키지를 설치하고 `npm start`를 실행해주세요.
 
 ---
 
