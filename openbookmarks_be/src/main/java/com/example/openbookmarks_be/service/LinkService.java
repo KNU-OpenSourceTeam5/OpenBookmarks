@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class LinkService {
 //        linkRepository.save(link);
 //    }
 
+    @Transactional
     public void createLink(LinkRequestDto dto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -36,6 +38,7 @@ public class LinkService {
         linkRepository.save(link);
     }
 
+    @Transactional(readOnly = true)
     public Page<LinkResponseDto> getLinks(String category, String search, String likedBy, Pageable pageable) {
 
         Page<Link> linksPage = category != null && !category.equals("좋아요")
@@ -43,15 +46,14 @@ public class LinkService {
                 : linkRepository.findAll(pageable);
 
         log.info("Links count: {}", linksPage.getTotalElements());
-        
+
         List<LinkResponseDto> dtos = linksPage.getContent().stream()
                 .map(LinkResponseDto::of)
                 .collect(Collectors.toList());
         return new PageImpl<>(dtos, pageable, linksPage.getTotalElements());
     }
 
-
-    // LinkService.java
+    @Transactional(readOnly = true)
     public List<LinkResponseDto> findLinksByPartialTitle(String title) {
         return linkRepository.findAllByTitleContainingIgnoreCase(title)
                 .stream()
@@ -59,7 +61,7 @@ public class LinkService {
                 .collect(Collectors.toList());
     }
 
-
+    @Transactional(readOnly = true)
     public List<LinkResponseDto> findLinksByUsername(String username) {
         List<Link> links = linkRepository.findByUser_Username(username);
         return links.stream()
@@ -67,7 +69,7 @@ public class LinkService {
                 .toList();
     }
 
-
+    @Transactional
     public boolean deleteLink(Long linkId, String username) {
         Optional<Link> optionalLink = linkRepository.findById(linkId);
         if (optionalLink.isEmpty()) {
@@ -83,7 +85,7 @@ public class LinkService {
         return true;
     }
 
-
+    @Transactional
     public boolean updateLink(Long linkId, LinkRequestDto dto, String username) {
         Optional<Link> optionalLink = linkRepository.findById(linkId);
         if (optionalLink.isEmpty()) {
