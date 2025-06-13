@@ -62,4 +62,14 @@ public class LinkService {
                 .map(LinkResponseDto::of)
                 .collect(Collectors.toList());
     }
+
+
+    public List<LinkResponseDto> findLinksByUploadedBy(String uploadedBy) {
+        List<Link> links = linkRepository.findByUploadedBy(uploadedBy);
+        return links.stream()
+                .map(LinkResponseDto::of)
+                .toList();
+    }
+
+
 }
