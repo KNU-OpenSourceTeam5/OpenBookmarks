@@ -39,8 +39,8 @@ export const addLink = (link) => api.post('/links', link);
 export const toggleLike = (linkId) => api.post(`/likes/toggle/${linkId}`);
 export const incrementView = (linkId) => api.post(`/views/increment/${linkId}`);
 
-export const getComments = (linkId) => api.get(`/comments/${linkId}`);
-export const addComment = (comment) => api.post('/comments', comment);
+export const getComments = (linkId) => api.get(`/links/${linkId}/comments`);
+export const addComment = (linkId, comment) => api.post(`/links/${linkId}/comments`, comment);
 export const getUserProfile = () => api.get('/users/me');
 
 export const login = (credentials) => api.post('/users/login', credentials);
