@@ -47,17 +47,18 @@ public class Link {
     @Column(name = "liked_by")
     private List<String> likedBy;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '익명'")
-    private String uploadedBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "uploaded_by", referencedColumnName = "username", nullable = false)
+    private User user;
 
-    public Link(LinkRequestDto dto) {
+    public Link(LinkRequestDto dto, User user) {
         this.title = dto.getTitle();
         this.contents = dto.getContents();
         this.url = dto.getUrl();
         this.likes = 0L;
         this.view = 0L;
         this.category = dto.getCategory() != null ? dto.getCategory() : "기타";
-        this.uploadedBy = dto.getUploadedBy() != null ? dto.getUploadedBy() : "익명";
+        this.user = user;
         this.createdAt = LocalDateTime.now();
         this.likedBy = new ArrayList<>();
     }
@@ -70,8 +71,6 @@ public class Link {
         if (this.category == null) {
             this.category = "기타";
         }
-        if (this.uploadedBy == null) {
-            this.uploadedBy = "익명";
-        }
+
     }
 }

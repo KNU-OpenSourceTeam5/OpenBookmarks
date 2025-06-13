@@ -29,14 +29,9 @@ public class LinkService {
 //    }
 
     public void createLink(LinkRequestDto dto, Long userId) {
-        String username = userRepository.findById(userId)
-                .map(User::getUsername)
-                .orElse("익명");
-
-        // uploadedBy를 덮어쓰기
-        dto.setUploadedBy(username);
-
-        Link link = new Link(dto);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Link link = new Link(dto, user);
         linkRepository.save(link);
     }
 
@@ -64,12 +59,11 @@ public class LinkService {
     }
 
 
-    public List<LinkResponseDto> findLinksByUploadedBy(String uploadedBy) {
-        List<Link> links = linkRepository.findByUploadedBy(uploadedBy);
+    public List<LinkResponseDto> findLinksByUsername(String username) {
+        List<Link> links = linkRepository.findByUser_Username(username);
         return links.stream()
                 .map(LinkResponseDto::of)
                 .toList();
     }
-
 
 }

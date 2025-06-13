@@ -10,5 +10,4 @@ public class LinkRequestDto {
     private String contents;
     private String url;
     private String category;
-    private String uploadedBy;
 }

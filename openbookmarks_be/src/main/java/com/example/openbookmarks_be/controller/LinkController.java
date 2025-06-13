@@ -72,10 +72,10 @@ public class LinkController {
         return ResponseEntity.ok(dtos);
     }
 
-    @GetMapping("/my/{uploadedBy}")
-    public ResponseEntity<List<LinkResponseDto>> getLinksByUploadedBy(@PathVariable String uploadedBy) {
-        List<LinkResponseDto> dtos = linkService.findLinksByUploadedBy(uploadedBy);
-        return ResponseEntity.ok(dtos);
+    @GetMapping("/my/{username}")
+    public ResponseEntity<List<LinkResponseDto>> getLinksByUsername(@PathVariable("username") String username) {
+        List<LinkResponseDto> links = linkService.findLinksByUsername(username);
+        return ResponseEntity.ok(links);
     }
 
 }
