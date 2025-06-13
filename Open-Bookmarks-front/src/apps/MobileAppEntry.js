@@ -10,6 +10,7 @@ import MobileSignupPage from "../components/mobile/SignupPage";
 import MobileLinkDetailPage from "../components/mobile/LinkDetailPage";
 import MobileSearchPage from "../components/mobile/SearchPage";
 import MobileProfilePage from "../components/mobile/ProfilePage";
+import MobileEditPage from "../components/mobile/EditPage";
 import { logout } from "../services/api";
 
 function App() {
@@ -138,6 +139,14 @@ function App() {
           }
         />
       </Routes>
+      <Route
+          path="/edit/:linkId"
+          element={
+              <div className="container mx-auto p-4">
+                  <MobileEditPage currentUser={currentUser} />
+              </div>
+          }
+      />
     </div>
   );
 }

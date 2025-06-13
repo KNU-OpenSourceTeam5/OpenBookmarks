@@ -10,6 +10,7 @@ import DesktopSignupPage from "../components/desktop/SignupPage";
 import DesktopLinkDetailPage from "../components/desktop/LinkDetailPage";
 import DesktopSearchPage from "../components/desktop/SearchPage";
 import DesktopProfilePage from "../components/desktop/ProfilePage";
+import DesktopEditPage from "../components/desktop/EditPage";
 import { logout } from "../services/api";
 
 function App() {
@@ -57,7 +58,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <DesktopNavBar
-        categories={["기술", "교육", "기타"]}
+        categories={["기술", "교육", "기타", "내글"]}
         toggleSidebar={toggleSidebar}
         isSidebarOpen={isSidebarOpen}
         isLoggedIn={isLoggedIn}
@@ -137,6 +138,14 @@ function App() {
             </div>
           }
         />
+      <Route
+          path="/edit/:linkId"
+          element={
+              <div className="container mx-auto p-4 pt-20">
+                  <DesktopEditPage currentUser={currentUser} />
+              </div>
+          }
+      />
       </Routes>
     </div>
   );
