@@ -49,6 +49,13 @@
 
 이 프로젝트는 누구나 자유롭게 기여할 수 있습니다. 기여 방법 및 절차는 [CONTRIBUTING.md](./CONTRIBUTING.md) 파일을 참고해 주세요.
 
-프로젝트에 참여하실 때는 [Code of Conduct](./CODE_OF_CONDUCT.md)를 꼭 준수해 주시기 바랍니다.
-
 ---
+
+
+## API 명세서
+https://documenter.getpostman.com/view/38122120/2sB2x6krtP
+
+## ERD
+
+![openbookmarks (1)](https://github.com/user-attachments/assets/4c8bf4b2-0855-4a29-a00f-4a913dc8b5b6)
+
