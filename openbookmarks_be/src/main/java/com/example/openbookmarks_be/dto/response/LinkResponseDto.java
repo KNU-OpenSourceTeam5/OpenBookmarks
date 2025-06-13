@@ -38,7 +38,7 @@ public class LinkResponseDto {
                 .category(link.getCategory())
                 .createdAt(link.getCreatedAt())
                 .likedBy(link.getLikedBy())
-                .uploadedBy(link.getUploadedBy())
+                .uploadedBy(link.getUser().getUsername())
                 .build();
     }
 }

@@ -72,4 +72,46 @@ public class LinkController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/my/{username}")
+    public ResponseEntity<List<LinkResponseDto>> getLinksByUsername(@PathVariable("username") String username) {
+        List<LinkResponseDto> links = linkService.findLinksByUsername(username);
+        return ResponseEntity.ok(links);
+    }
+
+
+    @DeleteMapping("{linkId}")
+    public ResponseEntity<String> deleteLink(@PathVariable Long linkId, HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        boolean deleted = linkService.deleteLink(linkId, username);
+        if (deleted) {
+            return ResponseEntity.ok("링크가 삭제되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다.");
+        }
+    }
+
+
+    @PutMapping("/{linkId}")
+    public ResponseEntity<String> updateLink(
+            @PathVariable Long linkId,
+            @RequestBody LinkRequestDto dto,
+            HttpSession session) {
+
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        boolean updated = linkService.updateLink(linkId, dto, username);
+        if (updated) {
+            return ResponseEntity.ok("링크가 수정되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
+        }
+    }
+
 }

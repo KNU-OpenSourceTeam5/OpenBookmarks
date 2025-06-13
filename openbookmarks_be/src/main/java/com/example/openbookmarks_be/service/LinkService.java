@@ -7,6 +7,7 @@ import com.example.openbookmarks_be.dto.response.LinkResponseDto;
 import com.example.openbookmarks_be.repository.LinkRepository;
 import com.example.openbookmarks_be.repository.UserRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,14 +30,9 @@ public class LinkService {
 //    }
 
     public void createLink(LinkRequestDto dto, Long userId) {
-        String username = userRepository.findById(userId)
-                .map(User::getUsername)
-                .orElse("익명");
-
-        // uploadedBy를 덮어쓰기
-        dto.setUploadedBy(username);
-
-        Link link = new Link(dto);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Link link = new Link(dto, user);
         linkRepository.save(link);
     }
 
@@ -62,4 +58,49 @@ public class LinkService {
                 .map(LinkResponseDto::of)
                 .collect(Collectors.toList());
     }
+
+
+    public List<LinkResponseDto> findLinksByUsername(String username) {
+        List<Link> links = linkRepository.findByUser_Username(username);
+        return links.stream()
+                .map(LinkResponseDto::of)
+                .toList();
+    }
+
+
+    public boolean deleteLink(Long linkId, String username) {
+        Optional<Link> optionalLink = linkRepository.findById(linkId);
+        if (optionalLink.isEmpty()) {
+            return false;
+        }
+
+        Link link = optionalLink.get();
+        if (!link.getUser().getUsername().equals(username)) {
+            return false;
+        }
+
+        linkRepository.delete(link);
+        return true;
+    }
+
+
+    public boolean updateLink(Long linkId, LinkRequestDto dto, String username) {
+        Optional<Link> optionalLink = linkRepository.findById(linkId);
+        if (optionalLink.isEmpty()) {
+            return false;
+        }
+
+        Link link = optionalLink.get();
+        if (!link.getUser().getUsername().equals(username)) {
+            return false;
+        }
+
+        // 수정
+        link.update(dto);
+
+        linkRepository.save(link);
+        return true;
+    }
+
+
 }

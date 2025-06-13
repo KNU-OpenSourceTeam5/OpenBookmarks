@@ -35,6 +35,8 @@ public class UserController {
         try {
             userService.login(dto, session);
             logger.info("로그인 성공: username={}, sessionId={}", dto.getUsername(), session.getId());
+            // 로그인 성공 시 세션에 사용자 정보 저장
+
             return ResponseEntity.ok("로그인 성공");
         } catch (IllegalArgumentException e) {
             logger.error("로그인 실패: {}", e.getMessage());
