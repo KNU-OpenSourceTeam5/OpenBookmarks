@@ -7,6 +7,7 @@ import com.example.openbookmarks_be.dto.response.LinkResponseDto;
 import com.example.openbookmarks_be.repository.LinkRepository;
 import com.example.openbookmarks_be.repository.UserRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,5 +66,22 @@ public class LinkService {
                 .map(LinkResponseDto::of)
                 .toList();
     }
+
+
+    public boolean deleteLink(Long linkId, String username) {
+        Optional<Link> optionalLink = linkRepository.findById(linkId);
+        if (optionalLink.isEmpty()) {
+            return false;
+        }
+
+        Link link = optionalLink.get();
+        if (!link.getUser().getUsername().equals(username)) {
+            return false;
+        }
+
+        linkRepository.delete(link);
+        return true;
+    }
+
 
 }
