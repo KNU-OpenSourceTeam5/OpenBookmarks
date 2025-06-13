@@ -84,4 +84,23 @@ public class LinkService {
     }
 
 
+    public boolean updateLink(Long linkId, LinkRequestDto dto, String username) {
+        Optional<Link> optionalLink = linkRepository.findById(linkId);
+        if (optionalLink.isEmpty()) {
+            return false;
+        }
+
+        Link link = optionalLink.get();
+        if (!link.getUser().getUsername().equals(username)) {
+            return false;
+        }
+
+        // 수정
+        link.update(dto);
+
+        linkRepository.save(link);
+        return true;
+    }
+
+
 }

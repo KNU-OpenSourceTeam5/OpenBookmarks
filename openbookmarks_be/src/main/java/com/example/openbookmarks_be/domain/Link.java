@@ -73,4 +73,11 @@ public class Link {
         }
 
     }
+
+    public void update(LinkRequestDto dto) {
+        this.title = dto.getTitle();
+        this.contents = dto.getContents();
+        this.url = dto.getUrl();
+        this.category = dto.getCategory();
+    }
 }
