@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import MobileNavbar from "../components/mobile/Navbar";
-import MobileLinkForm from "../components/mobile/LinkForm";
-import MobileCategorySection from "../components/mobile/CategorySection";
-import MobileIntroPage from "../components/mobile/IntroPage";
-import MobileLoginPage from "../components/mobile/LoginPage";
-import MobileSignupPage from "../components/mobile/SignupPage";
-import MobileLinkDetailPage from "../components/mobile/LinkDetailPage";
-import MobileSearchPage from "../components/mobile/SearchPage";
-import MobileProfilePage from "../components/mobile/ProfilePage";
+import DesktopNavBar from "../components/desktop/Navbar";
+import DesktopLinkForm from "../components/desktop/LinkForm";
+import DesktopCategorySection from "../components/desktop/CategorySection";
+import DesktopIntroPage from "../components/desktop/IntroPage";
+import DesktopLoginPage from "../components/desktop/LoginPage";
+import DesktopSignupPage from "../components/desktop/SignupPage";
+import DesktopLinkDetailPage from "../components/desktop/LinkDetailPage";
+import DesktopSearchPage from "../components/desktop/SearchPage";
+import DesktopProfilePage from "../components/desktop/ProfilePage";
+import DesktopEditPage from "../components/desktop/EditPage";
 import { logout } from "../services/api";
 
 function App() {
@@ -56,8 +57,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <MobileNavbar
-        categories={["기술", "교육", "기타"]}
+      <DesktopNavBar
+        categories={["기술", "교육", "기타", "내글"]}
         toggleSidebar={toggleSidebar}
         isSidebarOpen={isSidebarOpen}
         isLoggedIn={isLoggedIn}
@@ -71,7 +72,7 @@ function App() {
           path="/"
           element={
             <div className="container mx-auto p-4">
-              <MobileIntroPage />
+              <DesktopIntroPage />
             </div>
           }
         />
@@ -79,7 +80,7 @@ function App() {
           path="/category/:categoryName"
           element={
             <div className="container mx-auto p-4">
-              <MobileCategorySection
+              <DesktopCategorySection
                 currentUser={currentUser}
                 searchQuery={searchQuery}
               />
@@ -90,7 +91,7 @@ function App() {
           path="/add"
           element={
             <div className="container mx-auto p-4">
-              <MobileLinkForm />
+              <DesktopLinkForm />
             </div>
           }
         />
@@ -98,7 +99,7 @@ function App() {
           path="/login"
           element={
             <div className="container mx-auto p-4">
-              <MobileLoginPage onLogin={handleLogin} />
+              <DesktopLoginPage onLogin={handleLogin} />
             </div>
           }
         />
@@ -106,7 +107,7 @@ function App() {
           path="/register"
           element={
             <div className="container mx-auto p-4">
-              <MobileSignupPage onSignup={handleSignup} />
+              <DesktopSignupPage onSignup={handleSignup} />
             </div>
           }
         />
@@ -114,7 +115,7 @@ function App() {
           path="/links/:linkId"
           element={
             <div className="container mx-auto p-4">
-              <MobileLinkDetailPage currentUser={currentUser} />
+              <DesktopLinkDetailPage currentUser={currentUser} />
             </div>
           }
         />
@@ -122,7 +123,7 @@ function App() {
           path="/search"
           element={
             <div className="container mx-auto p-4">
-              <MobileSearchPage
+              <DesktopSearchPage
                 currentUser={currentUser}
                 searchQuery={searchQuery}
               />
@@ -133,10 +134,18 @@ function App() {
           path="/profile"
           element={
             <div className="container mx-auto p-4">
-              <MobileProfilePage currentUser={currentUser} />
+              <DesktopProfilePage currentUser={currentUser} />
             </div>
           }
         />
+      <Route
+          path="/edit/:linkId"
+          element={
+              <div className="container mx-auto p-4">
+                  <DesktopEditPage currentUser={currentUser} />
+              </div>
+          }
+      />
       </Routes>
     </div>
   );
