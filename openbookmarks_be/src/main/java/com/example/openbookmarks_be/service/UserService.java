@@ -1,13 +1,12 @@
 package com.example.openbookmarks_be.service;
 
-import com.example.openbookmarks_be.dto.request.UserRequestDto;
 import com.example.openbookmarks_be.domain.User;
+import com.example.openbookmarks_be.dto.request.UserRequestDto;
 import com.example.openbookmarks_be.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -16,11 +15,11 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     public void register(UserRequestDto dto) {
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
         }
-
 
         User user = new User(dto.getUsername(), dto.getPassword());
         userRepository.save(user);
